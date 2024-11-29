@@ -5,12 +5,13 @@ from PyQt6 import uic
 from PyQt6.QtCore import QPointF
 from PyQt6.QtGui import QPainter, QColor
 from PyQt6.QtWidgets import QMainWindow, QApplication
+from UI import Ui_MainWindow
 
 
-class Ex(QMainWindow):
+class Ex(QMainWindow,Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('UI.ui', self)
+        self.setupUi(self)
 
         self.pushButton.clicked.connect(self.draw)
         self.paint = False
@@ -21,10 +22,10 @@ class Ex(QMainWindow):
 
     def paintEvent(self, a0):
         if self.paint:
-            color = QColor(255, 255, 0)
+            r, g, b = random.randint(1, 255), random.randint(1, 255), random.randint(1, 255)
+            color = QColor(r, g, b)
             radius = random.randint(20, 50)
             qp = QPainter()
-
             qp.begin(self)
             qp.setBrush(color)
             qp.drawEllipse(QPointF(50, 50), float(radius), float(radius))
