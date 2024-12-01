@@ -1,37 +1,28 @@
-import random
+import sqlite3
 import sys
 
 from PyQt6 import uic
-from PyQt6.QtCore import QPointF
-from PyQt6.QtGui import QPainter, QColor
-from PyQt6.QtWidgets import QMainWindow, QApplication
-from UI import Ui_MainWindow
+from PyQt6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem
 
 
-class Ex(QMainWindow,Ui_MainWindow):
+class Ex(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setupUi(self)
+        uic.loadUi('main.ui', self)
 
-        self.pushButton.clicked.connect(self.draw)
-        self.paint = False
+        self.conn = sqlite3.connect('coffee.sqlite')
+        self.load_table()
 
-    def draw(self):
-        self.paint = True
-        self.update()
+    def load_table(self):
+        result = self.conn.cursor().execute('''SELECT * FROM coffee''').fetchall()
 
-    def paintEvent(self, a0):
-        if self.paint:
-            r, g, b = random.randint(1, 255), random.randint(1, 255), random.randint(1, 255)
-            color = QColor(r, g, b)
-            radius = random.randint(20, 50)
-            qp = QPainter()
-            qp.begin(self)
-            qp.setBrush(color)
-            qp.drawEllipse(QPointF(50, 50), float(radius), float(radius))
-            qp.drawEllipse(QPointF(200, 50), float(radius), float(radius))
-            qp.end()
-            self.paint = False
+        self.table.setColumnCount(7)
+        self.table.setHorizontalHeaderLabels(['ID', 'название сорта', 'степень обжарки', 'молотый/в зернах', 'описание вкуса', 'цена $', 'объем упаковки'])
+        self.table.setRowCount(len(result))
+        for i, row in enumerate(result):
+            for j, elem in enumerate(row):
+                self.table.setItem(i, j, QTableWidgetItem(str(elem)))
+        self.table.resizeColumnsToContents()
 
 
 if __name__ == '__main__':
